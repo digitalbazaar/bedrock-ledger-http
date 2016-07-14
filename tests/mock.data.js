@@ -14,5 +14,3 @@ var identities = {};
 data.identities = identities;
 
 // FIXME: Create users
-var userName = 'hhs';
-identities[userName] = {};

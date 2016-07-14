@@ -15,14 +15,12 @@ var mockData = require('./mock.data');
 
 
 describe('DHS 2016 Ledger HTTP API', function() {
-  /*
   before(function(done) {
     helpers.prepareDatabase(mockData, done);
   });
   after(function(done) {
     helpers.removeCollections(done);
   });
-  */
   describe('configuration', function() {
     it('should allow initial configuration', function(done) {
       done();
@@ -39,6 +37,9 @@ describe('DHS 2016 Ledger HTTP API', function() {
       done();
     });
     it('should not allow unsigned write', function(done) {
+      done();
+    });
+    it('should not allow out-of-order write', function(done) {
       done();
     });
   });
