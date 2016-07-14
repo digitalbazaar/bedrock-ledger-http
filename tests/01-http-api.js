@@ -13,7 +13,6 @@ var config = bedrock.config;
 var helpers = require('./helpers');
 var mockData = require('./mock.data');
 
-
 describe('DHS 2016 Ledger HTTP API', function() {
   before(function(done) {
     helpers.prepareDatabase(mockData, done);
@@ -33,10 +32,13 @@ describe('DHS 2016 Ledger HTTP API', function() {
     });
   });
   describe('ledger writing', function() {
+    it('should not allow unsigned write', function(done) {
+      done();
+    });
     it('should allow signed write', function(done) {
       done();
     });
-    it('should not allow unsigned write', function(done) {
+    it('should allow signed update', function(done) {
       done();
     });
     it('should not allow out-of-order write', function(done) {
@@ -48,6 +50,11 @@ describe('DHS 2016 Ledger HTTP API', function() {
       done();
     });
     it('should provide public access to ledger contents', function(done) {
+      done();
+    });
+  });
+  describe('ledger querying', function() {
+    it('should provide latest state for ledger entry', function(done) {
       done();
     });
   });
