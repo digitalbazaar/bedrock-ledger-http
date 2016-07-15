@@ -30,18 +30,27 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow unauthorized configuration', function(done) {
       done();
     });
-  });
-  describe('ledger writing', function() {
-    it('should not allow unsigned write', function(done) {
+    it('should not allow malformed configuration', function(done) {
       done();
     });
+  });
+  describe('ledger writing', function() {
     it('should allow signed write', function(done) {
       done();
     });
     it('should allow signed update', function(done) {
       done();
     });
+    it('should not allow unsigned write', function(done) {
+      done();
+    });
     it('should not allow out-of-order write', function(done) {
+      done();
+    });
+    it('should not allow unauthorized write', function(done) {
+      done();
+    });
+    it('should not allow malformed writes', function(done) {
       done();
     });
   });
