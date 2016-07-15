@@ -55,10 +55,10 @@ describe('DHS 2016 Ledger HTTP API', function() {
     });
   });
   describe('ledger reading', function() {
-    it('should provide public access to ledger metadata', function(done) {
+    it('should allow public access to ledger metadata', function(done) {
       done();
     });
-    it('should provide public access to ledger contents', function(done) {
+    it('should allow crawling from latest block to genesis block', function(done) {
       done();
     });
   });
