@@ -31,6 +31,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should allow initial configuration', function(done) {
       var ledgerConfigurationEvent = {
         '@context': 'https://w3id.org/flex/v1',
+        id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/genesis',
         type: 'LedgerConfigurationEvent',
         ledgerConfig: {
           id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3',
