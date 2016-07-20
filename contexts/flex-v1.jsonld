@@ -42,6 +42,7 @@
     "domain": "sec:domain",
     "expires": {"@id": "sec:expiration", "@type": "xsd:dateTime"},
     "label": "rdfs:label",
+    "ledgerConfig": "flex:ledgerConfig",
     "minimumQuorumPercentage": "flex:minimumQuorumPercentage",
     "minimumSignaturesRequired": "flex:minimumSignaturesRequired",
     "minimumVotePercentage": "flex:minimumVotePercentage",

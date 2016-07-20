@@ -11,57 +11,74 @@ var async = require('async');
 var bedrock = require('bedrock');
 var config = bedrock.config;
 var helpers = require('./helpers');
+var jsigs = require('jsonld-signatures');
 var mockData = require('./mock.data');
 var request = require('request');
 request = request.defaults({json: true});
 
+// ignore invalid TLS certificates in test mode
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
+// use local JSON-LD processor for signatures
+jsigs.use('jsonld', bedrock.jsonld);
 
 // endpoints used by the tests
 var ledgerEndpoint = config.server.baseUri + config.ledger.basePath;
+
+// authorized signer URL
+var authorizedSignerUrl = config.server.baseUri + '/i/fema/keys/1';
+
+// unauthorized signer URL
+var unauthorizedSignerUrl = config.server.baseUri + '/i/isis/keys/1';
+
+// base ledger configuration event
+var ledgerConfigurationEvent = {
+  '@context': 'https://w3id.org/flex/v1',
+  id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/genesis',
+  type: 'LedgerConfigurationEvent',
+  ledgerConfig: {
+    id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3',
+    type: 'LedgerConfiguration',
+    name: 'dhs2016poc',
+    description: 'A proof of concept for a Verifiable Claims ledger',
+    storageMechanism: 'SequentialList',
+    consensusAlgorithm: {
+      type: 'ProofOfSignature2016',
+      approvedSigner: authorizedSignerUrl,
+      minimumSignaturesRequired: 1
+    },
+  },
+  previousEvent: 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000'
+};
 
 describe('DHS 2016 Ledger HTTP API', function() {
   before(function(done) {
     helpers.prepareDatabase(mockData, done);
   });
   after(function(done) {
-    helpers.removeCollections(done);
+    //helpers.removeCollections(done);
+    done();
   });
   describe('configuration', function() {
     it('should allow initial configuration', function(done) {
-      var ledgerConfigurationEvent = {
-        '@context': 'https://w3id.org/flex/v1',
-        id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/genesis',
-        type: 'LedgerConfigurationEvent',
-        ledgerConfig: {
-          id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3',
-          type: 'LedgerConfiguration',
-          name: 'dhs2016poc',
-          description: 'A proof of concept for a Verifiable Claims ledger',
-          storageMechanism: 'SequentialList',
-          consensusAlgorithm: {
-            type: 'ProofOfSignature2016',
-            approvedSigner: 'https://webville.va.us.gov/i/planning-department',
-            minimumSignaturesRequired: 1
-          },
-        },
-        previousEvent: 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000',
-        signature: {
-          type: 'LinkedDataSignature2016',
-          created: '2016-02-21T02:10:21Z',
-          creator: 'https://webville.va.us.gov/i/planning-department/keys/1',
-          signatureValue: 'cNJGLFqT/d/90D4GFzv...yKPiw=='
+      jsigs.sign(ledgerConfigurationEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedConfigEvent) {
+        if(err) {
+          return done(err);
         }
-      };
-
-      request.post({
-        url: ledgerEndpoint,
-        body: ledgerConfigurationEvent,
-        json: true
-      }, function(err, res, body) {
-        should.not.exist(err);
-        res.statusCode.should.equal(201);
-        done();
+        console.log(signedConfigEvent);
+        request.post({
+          url: ledgerEndpoint,
+          body: signedConfigEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(201);
+          done();
+        });
       });
     });
     it('should not allow unsigned configuration', function(done) {
