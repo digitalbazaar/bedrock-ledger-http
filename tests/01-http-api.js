@@ -120,7 +120,6 @@ describe('DHS 2016 Ledger HTTP API', function() {
   });
   describe('ledger writing', function() {
     it('should allow signed write', function(done) {
-      done(); // FIXME: temporary
       jsigs.sign(ledgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
         privateKeyPem: mockData.agencies.fema.privateKey,

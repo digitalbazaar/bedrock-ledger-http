@@ -15,6 +15,20 @@ var postConfig = {
   }
 };
 
+var postLedgerEvent = {
+  type: 'object',
+  properties: {
+    type: {
+      type: 'string',
+      enum: ['LedgerStorageEvent']
+    }
+  }
+};
+
 module.exports.postConfig = function() {
   return postConfig;
+};
+
+module.exports.postLedgerEvent = function() {
+  return postLedgerEvent;
 };

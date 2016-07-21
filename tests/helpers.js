@@ -74,7 +74,7 @@ api.prepareDatabase = function(mockData, callback) {
 
 api.removeCollections = function(callback) {
   var collectionNames =
-    ['ledger'];
+    ['ledger', 'dhs2016poc_ledger'];
   database.openCollections(collectionNames, function(err) {
     async.each(collectionNames, function(collectionName, callback) {
       database.collections[collectionName].remove({}, callback);
