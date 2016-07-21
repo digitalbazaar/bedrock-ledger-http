@@ -55,10 +55,10 @@ var ledgerConfigurationEvent = {
 };
 
 // ledger storage event - verifiable claim
-var ledgerStorageEvent = {
+var firstLedgerStorageEvent = {
   '@context': [
-    'https://w3id.org/flex/v1'/*,
-    'https://w3id.org/dhs/credentials/v1',*/
+    'https://w3id.org/flex/v1',
+    'https://w3id.org/dhs/v1',
   ],
   id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/2',
   type: 'LedgerStorageEvent',
@@ -75,6 +75,29 @@ var ledgerStorageEvent = {
   }],
   previousEvent: {
     id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/1',
+    hash: 'urn:sha256:'
+  }
+};
+var secondLedgerStorageEvent = {
+  '@context': [
+    'https://w3id.org/flex/v1',
+    'https://w3id.org/dhs/v1',
+  ],
+  id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/3',
+  type: 'LedgerStorageEvent',
+  replacesObject: [{
+    id: 'https://example.us.gov/credentials/234234542',
+    type: ['Credential', 'EmergencyResponseCredential'],
+    claim: {
+      id: 'did:370d4e2c-8839-4588-9ff7-2fda89da341f',
+      emsLicense: {
+        id: 'ems:FF-37-48573',
+        status: 'revoked'
+      }
+    }
+  }],
+  previousEvent: {
+    id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/2',
     hash: 'urn:sha256:'
   }
 };
@@ -120,7 +143,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
   });
   describe('ledger writing', function() {
     it('should allow signed write', function(done) {
-      jsigs.sign(ledgerStorageEvent, {
+      jsigs.sign(firstLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
         privateKeyPem: mockData.agencies.fema.privateKey,
         creator: authorizedSignerUrl
@@ -140,7 +163,24 @@ describe('DHS 2016 Ledger HTTP API', function() {
       });
     });
     it('should allow signed update', function(done) {
-      done();
+      jsigs.sign(secondLedgerStorageEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedStorageEvent) {
+        if(err) {
+          return done(err);
+        }
+        request.post({
+          url: dhsLedgerEndpoint,
+          body: signedStorageEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(201);
+          done();
+        });
+      });
     });
     it('should not allow unsigned write', function(done) {
       done();
@@ -156,8 +196,21 @@ describe('DHS 2016 Ledger HTTP API', function() {
     });
   });
   describe('ledger reading', function() {
-    it('should allow public access to ledger metadata', function(done) {
-      done();
+    it('should allow public access to all ledger metadata', function(done) {
+      request(ledgerEndpoint, function(err, res, body){
+        should.not.exist(err);
+        res.statusCode.should.equal(200);
+        body.ledger[0].name.should.equal('dhs2016poc');
+        done();
+      });
+    });
+    it('should allow public access to specific ledger metadata', function(done) {
+      request(dhsLedgerEndpoint, function(err, res, body){
+        should.not.exist(err);
+        res.statusCode.should.equal(200);
+        body.name.should.equal('dhs2016poc');
+        done();
+      });
     });
     it('should allow crawling from latest block to genesis block', function(done) {
       done();
