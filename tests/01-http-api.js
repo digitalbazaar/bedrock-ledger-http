@@ -197,7 +197,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
   });
   describe('ledger reading', function() {
     it('should allow public access to all ledger metadata', function(done) {
-      request(ledgerEndpoint, function(err, res, body){
+      request(ledgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
         body.ledger[0].name.should.equal('dhs2016poc');
@@ -205,10 +205,11 @@ describe('DHS 2016 Ledger HTTP API', function() {
       });
     });
     it('should allow public access to specific ledger metadata', function(done) {
-      request(dhsLedgerEndpoint, function(err, res, body){
+      request(dhsLedgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
         body.name.should.equal('dhs2016poc');
+        console.log("LS", body);
         done();
       });
     });
