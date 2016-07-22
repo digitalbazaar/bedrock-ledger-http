@@ -250,7 +250,14 @@ describe('DHS 2016 Ledger HTTP API', function() {
   });
   describe('ledger querying', function() {
     it('should provide latest state for ledger entry', function(done) {
-      done();
+      var query = dhsLedgerEndpoint + '/state?id=' +
+      'https://example.us.gov/credentials/234234542';
+      request(query, function(err, res, body) {
+        should.not.exist(err);
+        res.statusCode.should.equal(200);
+        body.id.should.equal('https://example.us.gov/credentials/234234542');
+        done();
+      });
     });
   });
 });
