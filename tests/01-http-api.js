@@ -32,6 +32,9 @@ var authorizedSignerUrl = config.server.baseUri + '/i/fema/keys/1';
 // unauthorized signer URL
 var unauthorizedSignerUrl = config.server.baseUri + '/i/isis/keys/1';
 
+// constants
+var GENESIS_HASH = 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000';
+
 // base ledger configuration event
 var ledgerConfigurationEvent = {
   '@context': 'https://w3id.org/flex/v1',
@@ -50,7 +53,7 @@ var ledgerConfigurationEvent = {
     },
   },
   previousEvent: {
-    hash: 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000'
+    hash: GENESIS_HASH
   }
 };
 
@@ -196,7 +199,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     });
   });
   describe('ledger reading', function() {
-    it('should allow public access to all ledger metadata', function(done) {
+    it('should allow access to all ledger metadata', function(done) {
       request(ledgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
@@ -204,17 +207,45 @@ describe('DHS 2016 Ledger HTTP API', function() {
         done();
       });
     });
-    it('should allow public access to specific ledger metadata', function(done) {
+    it('should allow access to specific ledger metadata', function(done) {
       request(dhsLedgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
         body.name.should.equal('dhs2016poc');
-        console.log("LS", body);
         done();
       });
     });
-    it('should allow crawling from latest block to genesis block', function(done) {
-      done();
+    it('should allow crawling to genesis block', function(done) {
+      var currentHash = '';
+      async.auto({
+        getLatestEvent: function(callback) {
+          request(dhsLedgerEndpoint, function(err, res, body) {
+            callback(err, body);
+          });
+        },
+        crawlToGenesisEvent: ['getLatestEvent', function(callback, results) {
+          var currentUrl =
+            dhsLedgerEndpoint + '/' + results.getLatestEvent.latestEvent.id;
+          currentHash = results.getLatestEvent.latestEvent.hash;
+          async.until(function() {
+              return currentHash == GENESIS_HASH;
+            }, function(callback) {
+              request(currentUrl, function(err, res, body) {
+                currentUrl = dhsLedgerEndpoint + '/' + body.previousEvent.id;
+                currentHash = body.previousEvent.hash;
+                callback(err, body);
+              });
+            },
+            function (err, result) {
+              result.id.should.equal(
+                'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/1');
+              result.previousEvent.hash.should.equal(
+                GENESIS_HASH);
+              done(err, result);
+          });
+        }]}, function(err, results) {
+          done(err);
+        });
     });
   });
   describe('ledger querying', function() {
