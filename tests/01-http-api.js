@@ -134,13 +134,13 @@ describe('DHS 2016 Ledger HTTP API', function() {
         });
       });
     });
-    it('should not allow unsigned configuration', function(done) {
+    it.skip('should not allow unsigned configuration', function(done) {
       done();
     });
-    it('should not allow unauthorized configuration', function(done) {
+    it.skip('should not allow unauthorized configuration', function(done) {
       done();
     });
-    it('should not allow malformed configuration', function(done) {
+    it.skip('should not allow malformed configuration', function(done) {
       done();
     });
   });
@@ -185,16 +185,16 @@ describe('DHS 2016 Ledger HTTP API', function() {
         });
       });
     });
-    it('should not allow unsigned write', function(done) {
+    it.skip('should not allow unsigned write', function(done) {
       done();
     });
-    it('should not allow out-of-order write', function(done) {
+    it.skip('should not allow out-of-order write', function(done) {
       done();
     });
-    it('should not allow unauthorized write', function(done) {
+    it.skip('should not allow unauthorized write', function(done) {
       done();
     });
-    it('should not allow malformed writes', function(done) {
+    it.skip('should not allow malformed writes', function(done) {
       done();
     });
   });
