@@ -446,6 +446,7 @@ _.forEach(Object.keys(agencies), function(value) {
   });
   var keyPair = helpers.createKeyPair({
     userId: identity.id,
+    userName: identity.sysSlug,
     publicKey: agencies[value].publicKey,
     privateKey: agencies[value].privateKey,
   });

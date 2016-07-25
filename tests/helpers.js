@@ -16,8 +16,10 @@ var api = {};
 module.exports = api;
 
 api.createIdentity = function(userName) {
+  var userId = config.server.baseUri + config['identity-rest'].basePath + '/' +
+    userName;
   var newIdentity = {
-    id: 'did:' + uuid(),
+    id: userId,
     type: 'Identity',
     sysSlug: userName,
     label: userName,
@@ -35,6 +37,8 @@ api.createKeyPair = function(options) {
   var userName = options.userName;
   var publicKey = options.publicKey;
   var privateKey = options.privateKey;
+  var keyId = config.server.baseUri + config.key.basePath + '/' +
+    userName + '-key-1';
   var ownerId = null;
   if(userName === 'userUnknown') {
     ownerId = '';
@@ -44,17 +48,17 @@ api.createKeyPair = function(options) {
   var newKeyPair = {
     publicKey: {
       '@context': 'https://w3id.org/identity/v1',
-      id: ownerId + '/keys/1',
+      id: keyId,
       type: 'CryptographicKey',
       owner: ownerId,
-      label: 'Signing Key 1',
+      label: userName + ' signing key',
       publicKeyPem: publicKey
     },
     privateKey: {
       type: 'CryptographicKey',
       owner: ownerId,
-      label: 'Signing Key 1',
-      publicKey: ownerId + '/keys/1',
+      label: userName + ' signing key',
+      publicKey: keyId,
       privateKeyPem: privateKey
     }
   };
@@ -97,10 +101,19 @@ api.removeCollection = function(collection, callback) {
 
 // Insert identities and public keys used for testing into database
 function insertTestData(mockData, callback) {
+  // add to view variables
+  config.views.vars['dhs2016poc'] = {
+    identity: {}
+  };
   async.forEachOf(mockData.identities, function(identity, key, callback) {
     async.parallel([
       function(callback) {
         brIdentity.insert(null, identity.identity, callback);
+        var viewsIdentity = identity.identity;
+        viewsIdentity.publicKey = identity.keys.publicKey;
+        viewsIdentity.privateKey = identity.keys.privateKey;
+        config.views.vars['dhs2016poc'].identity[viewsIdentity.sysSlug] =
+          viewsIdentity;
       },
       function(callback) {
         brKey.addPublicKey(null, identity.keys.publicKey, callback);
