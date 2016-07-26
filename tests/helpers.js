@@ -103,7 +103,8 @@ api.removeCollection = function(collection, callback) {
 function insertTestData(mockData, callback) {
   // add to view variables
   config.views.vars['dhs2016poc'] = {
-    identity: {}
+    identity: {},
+    authorizedSigners: []
   };
   async.forEachOf(mockData.identities, function(identity, key, callback) {
     async.parallel([
@@ -114,6 +115,10 @@ function insertTestData(mockData, callback) {
         viewsIdentity.privateKey = identity.keys.privateKey;
         config.views.vars['dhs2016poc'].identity[viewsIdentity.sysSlug] =
           viewsIdentity;
+        if(viewsIdentity.sysSlug != 'isis') {
+          config.views.vars['dhs2016poc'].authorizedSigners.push(
+            viewsIdentity.publicKey.id);
+        }
       },
       function(callback) {
         brKey.addPublicKey(null, identity.keys.publicKey, callback);
