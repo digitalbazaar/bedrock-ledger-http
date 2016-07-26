@@ -106,6 +106,7 @@ function insertTestData(mockData, callback) {
     identity: {},
     authorizedSigners: []
   };
+
   async.forEachOf(mockData.identities, function(identity, key, callback) {
     async.parallel([
       function(callback) {
