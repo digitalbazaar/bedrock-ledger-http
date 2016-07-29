@@ -24,7 +24,7 @@ jsigs.use('jsonld', bedrock.jsonld);
 
 // endpoints used by the tests
 var ledgerEndpoint = config.server.baseUri + config.ledger.basePath;
-var dhsLedgerEndpoint = ledgerEndpoint + '/dhs2016poc';
+var dhsLedgerEndpoint = ledgerEndpoint + '/dhs2016ledger';
 
 // authorized signer URL
 var authorizedSignerUrl = config.server.baseUri + '/i/fema/keys/1';
@@ -43,7 +43,7 @@ var ledgerConfigurationEvent = {
   ledgerConfig: {
     id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3',
     type: 'LedgerConfiguration',
-    name: 'dhs2016poc',
+    name: 'dhs2016ledger',
     description: 'A proof of concept for a Verifiable Claims ledger',
     storageMechanism: 'SequentialList',
     consensusAlgorithm: {
@@ -203,7 +203,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
       request(ledgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
-        body.ledger[0].name.should.equal('dhs2016poc');
+        body.ledger[0].name.should.equal('dhs2016ledger');
         done();
       });
     });
@@ -211,7 +211,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
       request(dhsLedgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
-        body.name.should.equal('dhs2016poc');
+        body.name.should.equal('dhs2016ledger');
         done();
       });
     });

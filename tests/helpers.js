@@ -78,7 +78,7 @@ api.prepareDatabase = function(mockData, callback) {
 
 api.removeCollections = function(callback) {
   var collectionNames =
-    ['ledger', 'dhs2016poc_ledger'];
+    ['ledger', 'dhs2016ledger_ledger'];
   database.openCollections(collectionNames, function(err) {
     async.each(collectionNames, function(collectionName, callback) {
       database.collections[collectionName].remove({}, callback);
@@ -102,7 +102,7 @@ api.removeCollection = function(collection, callback) {
 // Insert identities and public keys used for testing into database
 function insertTestData(mockData, callback) {
   // add to view variables
-  config.views.vars['dhs2016poc'] = {
+  config.views.vars['dhs2016ledger'] = {
     identity: {},
     authorizedSigners: []
   };
@@ -114,10 +114,10 @@ function insertTestData(mockData, callback) {
         var viewsIdentity = identity.identity;
         viewsIdentity.publicKey = identity.keys.publicKey;
         viewsIdentity.privateKey = identity.keys.privateKey;
-        config.views.vars['dhs2016poc'].identity[viewsIdentity.sysSlug] =
+        config.views.vars['dhs2016ledger'].identity[viewsIdentity.sysSlug] =
           viewsIdentity;
         if(viewsIdentity.sysSlug != 'isis') {
-          config.views.vars['dhs2016poc'].authorizedSigners.push(
+          config.views.vars['dhs2016ledger'].authorizedSigners.push(
             viewsIdentity.publicKey.id);
         }
       },
