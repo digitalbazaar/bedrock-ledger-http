@@ -48,7 +48,7 @@ var ledgerConfigurationEvent = {
     storageMechanism: 'SequentialList',
     consensusAlgorithm: {
       type: 'ProofOfSignature2016',
-      approvedSigner: authorizedSignerUrl,
+      approvedSigner: [authorizedSignerUrl],
       minimumSignaturesRequired: 1
     },
   },
@@ -144,7 +144,27 @@ describe('DHS 2016 Ledger HTTP API', function() {
         done();
       });
     });
-    it.skip('should not allow unauthorized configuration', function(done) {
+    it('should not allow unauthorized configuration', function(done) {
+      jsigs.sign(ledgerConfigurationEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.isis.privateKey,
+        creator: unauthorizedSignerUrl
+      }, function(err, signedConfigEvent) {
+        if(err) {
+          return done(err);
+        }
+        request.post({
+          url: ledgerEndpoint,
+          body: signedConfigEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(403);
+          done();
+        });
+      });
+    });
+    it.skip('should not allow invalid signature on configuration', function(done) {
       done();
     });
     it.skip('should not allow malformed configuration', function(done) {
