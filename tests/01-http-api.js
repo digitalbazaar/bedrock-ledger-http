@@ -134,8 +134,15 @@ describe('DHS 2016 Ledger HTTP API', function() {
         });
       });
     });
-    it.skip('should not allow unsigned configuration', function(done) {
-      done();
+    it('should not allow unsigned configuration', function(done) {
+      request.post({
+        url: ledgerEndpoint,
+        body: ledgerConfigurationEvent,
+        json: true
+      }, function(err, res, body) {
+        res.statusCode.should.equal(400);
+        done();
+      });
     });
     it.skip('should not allow unauthorized configuration', function(done) {
       done();

@@ -8,20 +8,17 @@ var postConfig = {
   type: 'object',
   properties: {
     '@context': schemas.jsonldContext(constants.FLEX_LEDGER_CONTEXT_V1_URL),
-    type: {
-      type: 'string',
-      enum: ['LedgerConfigurationEvent']
-    }
+    type:  schemas.jsonldType('LedgerConfigurationEvent'),
+    signature: schemas.linkedDataSignature()
   }
 };
 
 var postLedgerEvent = {
   type: 'object',
   properties: {
-    type: {
-      type: 'string',
-      enum: ['LedgerStorageEvent']
-    }
+    '@context': schemas.jsonldContext(constants.FLEX_LEDGER_CONTEXT_V1_URL),
+    type: schemas.jsonldType('LedgerStorageEvent'),
+    signature: schemas.linkedDataSignature()
   }
 };
 
