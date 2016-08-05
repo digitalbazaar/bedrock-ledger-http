@@ -254,17 +254,85 @@ describe('DHS 2016 Ledger HTTP API', function() {
         });
       });
     });
-    it.skip('should not allow unsigned write', function(done) {
-      done();
+    it('should not allow unsigned write', function(done) {
+      request.post({
+        url: dhsLedgerEndpoint,
+        body: firstLedgerStorageEvent,
+        json: true
+      }, function(err, res, body) {
+        should.not.exist(err);
+        res.statusCode.should.equal(400);
+        done();
+      });
     });
     it.skip('should not allow out-of-order write', function(done) {
       done();
     });
-    it.skip('should not allow unauthorized write', function(done) {
-      done();
+    it('should not allow unauthorized write', function(done) {
+      jsigs.sign(secondLedgerStorageEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedStorageEvent) {
+        if(err) {
+          return done(err);
+        }
+        signedStorageEvent.signature.creator = unauthorizedSignerUrl;
+        request.post({
+          url: dhsLedgerEndpoint,
+          body: signedStorageEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(403);
+          done();
+        });
+      });
     });
-    it.skip('should not allow malformed writes', function(done) {
-      done();
+    it('should not allow invalid signature', function(done) {
+      jsigs.sign(secondLedgerStorageEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedStorageEvent) {
+        if(err) {
+          return done(err);
+        }
+        // corrupt the signature
+        signedStorageEvent.signature.signatureValue =
+          signedStorageEvent.signature.signatureValue.replace('a', 'b');
+        request.post({
+          url: dhsLedgerEndpoint,
+          body: signedStorageEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(403);
+          done();
+        });
+      });
+    });
+    it('should not allow malformed writes', function(done) {
+      jsigs.sign(secondLedgerStorageEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedStorageEvent) {
+        if(err) {
+          return done(err);
+        }
+        // make the storage event malformed
+        delete signedStorageEvent.previousEvent.id;
+        request.post({
+          url: dhsLedgerEndpoint,
+          body: signedStorageEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(400);
+          done();
+        });
+      });
     });
   });
   describe('ledger reading', function() {

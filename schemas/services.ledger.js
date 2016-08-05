@@ -69,6 +69,24 @@ var postLedgerEvent = {
   properties: {
     '@context': schemas.jsonldContext(constants.FLEX_LEDGER_CONTEXT_V1_URL),
     type: schemas.jsonldType('LedgerStorageEvent'),
+    replacesObject: {
+      type: 'array',
+      items: {
+        type: 'object'
+      }
+    },
+    previousEvent: {
+      type: 'object',
+      properties: {
+        id: schemas.identifier({required: true}),
+        hash: {
+          title: 'Block hash',
+          description: 'The hash value the previous event in the blockchain.',
+          required: true,
+          type: schemas.url()
+        },
+      },
+    },
     signature: schemas.linkedDataSignature()
   }
 };
