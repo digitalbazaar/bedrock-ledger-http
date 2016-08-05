@@ -165,7 +165,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
         });
       });
     });
-    it.skip('should not allow invalid signature on configuration', function(done) {
+    it('should not allow invalid signature', function(done) {
       jsigs.sign(ledgerConfigurationEvent, {
         algorithm: 'LinkedDataSignature2015',
         privateKeyPem: mockData.agencies.fema.privateKey,
