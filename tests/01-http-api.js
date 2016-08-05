@@ -27,10 +27,10 @@ var ledgerEndpoint = config.server.baseUri + config.ledger.basePath;
 var dhsLedgerEndpoint = ledgerEndpoint + '/dhs2016ledger';
 
 // authorized signer URL
-var authorizedSignerUrl = config.server.baseUri + '/i/fema/keys/1';
+var authorizedSignerUrl = config.server.baseUri + '/keys/fema-key-1';
 
 // unauthorized signer URL
-var unauthorizedSignerUrl = config.server.baseUri + '/i/isis/keys/1';
+var unauthorizedSignerUrl = config.server.baseUri + '/keys/isis-key-1';
 
 // constants
 var GENESIS_HASH = 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000';
@@ -140,6 +140,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
         body: ledgerConfigurationEvent,
         json: true
       }, function(err, res, body) {
+        should.not.exist(err);
         res.statusCode.should.equal(400);
         done();
       });
@@ -165,7 +166,28 @@ describe('DHS 2016 Ledger HTTP API', function() {
       });
     });
     it.skip('should not allow invalid signature on configuration', function(done) {
-      done();
+      jsigs.sign(ledgerConfigurationEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedConfigEvent) {
+        if(err) {
+          return done(err);
+        }
+        // corrupt the signature
+        signedConfigEvent.signature.signatureValue =
+          signedConfigEvent.signature.signatureValue.replace('a', 'b');
+
+        request.post({
+          url: ledgerEndpoint,
+          body: signedConfigEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(403);
+          done();
+        });
+      });
     });
     it.skip('should not allow malformed configuration', function(done) {
       done();
