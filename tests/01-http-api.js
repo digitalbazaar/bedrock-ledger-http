@@ -189,8 +189,28 @@ describe('DHS 2016 Ledger HTTP API', function() {
         });
       });
     });
-    it.skip('should not allow malformed configuration', function(done) {
-      done();
+    it('should not allow malformed configuration', function(done) {
+      jsigs.sign(ledgerConfigurationEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedConfigEvent) {
+        if(err) {
+          return done(err);
+        }
+        // make the request malformed
+        signedConfigEvent.ledgerConfig.consensusAlgorithm.approvedSigner =
+          authorizedSignerUrl;
+        request.post({
+          url: ledgerEndpoint,
+          body: signedConfigEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(400);
+          done();
+        });
+      });
     });
   });
   describe('ledger writing', function() {
