@@ -265,8 +265,28 @@ describe('DHS 2016 Ledger HTTP API', function() {
         done();
       });
     });
-    it.skip('should not allow out-of-order write', function(done) {
-      done();
+    it('should not allow out-of-order write', function(done) {
+      secondLedgerStorageEvent.id =
+        'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/4';
+
+      jsigs.sign(secondLedgerStorageEvent, {
+        algorithm: 'LinkedDataSignature2015',
+        privateKeyPem: mockData.agencies.fema.privateKey,
+        creator: authorizedSignerUrl
+      }, function(err, signedStorageEvent) {
+        if(err) {
+          return done(err);
+        }
+        request.post({
+          url: dhsLedgerEndpoint,
+          body: signedStorageEvent,
+          json: true
+        }, function(err, res, body) {
+          should.not.exist(err);
+          res.statusCode.should.equal(400);
+          done();
+        });
+      });
     });
     it('should not allow unauthorized write', function(done) {
       jsigs.sign(secondLedgerStorageEvent, {
