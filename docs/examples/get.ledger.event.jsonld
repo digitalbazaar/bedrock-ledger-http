@@ -1,0 +1,25 @@
+{
+  "@context": ["https://w3id.org/flex/v1", "https://w3id.org/insurance/v1"],
+  "id": "did:b6e68fe1-bbbd-4cb1-b2e0-95052e3742c3/events/2",
+  "type": "LedgerStorageEvent",
+  "replacesObject": [{
+    "id": "https://insurance-king.com/claims/9665780",
+    "type": ["Credential", "InsuranceClaimCredential"],
+    "claim": {
+      "id": "urn:claim:293263769315",
+      "vin": "998BT259032238661",
+      "claimDate": "2015-05-22",
+      "insuranceProvider": "InsuranceKing"
+    }
+  }],
+  "previousEvent": {
+    "id": "did:b6e68fe1-bbbd-4cb1-b2e0-95052e3742c3/events/1",
+    "hash": "urn:sha256:693a75a3c9e6780af03eaf5070dfef53460eacfbe27f63473a28673a75b6723c"
+  },
+  "signature": {
+    "type": "LinkedDataSignature2015",
+    "created": "2016-08-10T03:54:34Z",
+    "creator": "{{baseUri}}/keys/ik-key-1",
+    "signatureValue": "EQyX4aMnD41bCg94sjOoH8QUuulLbxXTXN+H3iPfe3MG5Z2kAVq3KeQoOtUaPcJ4E6MtlBqbHxifVl1YVsDvneyJbS+vzUiIppVPLwohkWvqvKLmdlHTTHbrHK+WMnsX8toKS0mXal5OC/R61aFy2Wl+ejZE25jsEyw/RHfZJmxbmc9n87JfwDdjnQ8TkPXOgipqwjx3aDyZMdjbHTQjry+TJGNziUDrPyd1p9LHqnf+v7xzyP6Baxr30cLPtoD1FSb9ywAOLrgQtdeVDWvXYema1hqsKS6sUy8Ey6VUtSCaDMZhrhAavxzkx+qcSUsOps1Xl9owv6O7T5bJQNv18g=="
+  }
+}

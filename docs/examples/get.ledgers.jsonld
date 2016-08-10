@@ -1,0 +1,28 @@
+{
+  "ledger": [{
+    "id": "{{baseUri}}/ledgers/test-ledger",
+    "name": "test-ledger",
+    "ledgerConfig": {
+      "id": "did:df17261e-ddf8-4efc-8c83-5a84dd74ac4a",
+      "type": "LedgerConfiguration",
+      "name": "test-ledger",
+      "description": "This is a test ledger.",
+      "storageMechanism": "SequentialList",
+      "consensusAlgorithm": {
+        "type": "ProofOfSignature2016",
+        "approvedSigner": [
+          "{{baseUri}}/keys/blue-key-1", 
+          "{{baseUri}}/keys/red-key-1"
+        ],
+        "minimumSignaturesRequired": 1
+      }
+    },
+    "latestEvent": {
+      "id": "did:df17261e-ddf8-4efc-8c83-5a84dd74ac4a/events/1",
+      "hash": "urn:sha256:03b9292eae998e48a9ecc758709f1684044e9e1508bae4bdf338a442381a802b"
+    },
+    "nextEvent": {
+      "id": "did:df17261e-ddf8-4efc-8c83-5a84dd74ac4a/events/2"
+    }
+  }]
+}
