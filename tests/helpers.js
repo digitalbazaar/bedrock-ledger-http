@@ -16,7 +16,7 @@ var api = {};
 module.exports = api;
 
 api.createIdentity = function(userName) {
-  var userId = config.server.baseUri + config['identity-rest'].basePath + '/' +
+  var userId = config.server.baseUri + config['identity-http'].basePath + '/' +
     userName;
   var newIdentity = {
     id: userId,
