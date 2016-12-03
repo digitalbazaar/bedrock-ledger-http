@@ -1,54 +1,126 @@
-# Linked Data Ledgers Proof of Concept
+# Bedrock Ledger
 
-This source code repository includes a proof-of-concept Linked
-Data ledger. On start-up, the ledger does the following:
+A [bedrock][] module to control the creation and management of decentralized 
+ledgers via an HTTP API.
 
-* initializes itself by writing a basic configuration block 
-  to the ledger (if one doesn't already exist)
-* enables writes to the ledger given a set of pre-authorized keys
+## Requirements
 
-The ledger in this demo has the following features:
+- npm v3+
 
-* writes via digital signatures from pre-authorized keys to an
-  append-only ledger
-* exposes ledger internals via the [Flex Ledger][] data model 
-  specification
-* disk-only read/write protocol (no mirroring)
-* public readability of ledger contents
-
-To exercise the proof of concepts, a test suite is included
-that tests:
-
-* a node reading and applying the ledger configuration to grant
-  or deny write authorization to the ledger
-* writes of identity credentials/verifiable claims to blocks
-
-## Installation
+## Quick Examples
 
 ```
-npm install
+npm install bedrock-ledger-http
 ```
 
-**Note**: This proof of concept requires a [host file entry][] 
-for `dhs2016ledger.dev` pointing to `127.0.0.1` (localhost)
-or the public IP address of your computer.
+```js
+var actor = 'admin';
 
-## Running the demo
+var ledgerEndpoint = 'https://example.org/ledgers/';
 
+var ledgerConfigEvent = {
+  '@context': 'https://w3id.org/flex/v1',
+  id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/1',
+  type: 'LedgerConfigurationEvent',
+  ledgerConfig: {
+    id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3',
+    type: 'LedgerConfiguration',
+    name: 'test-ledger',
+    description: 'A test ledger',
+    storageMechanism: 'SequentialList',
+    consensusAlgorithm: {
+      type: 'ProofOfSignature2016',
+      approvedSigner: [ 'https://example.org/keys/authorized-1' ],
+      minimumSignaturesRequired: 1
+    },
+  },
+  previousEvent: {
+    hash: 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000';
+  }
+};
+
+jsigs.sign(ledgerConfigurationEvent, {
+    algorithm: 'LinkedDataSignature2015',
+    privateKeyPem: myPrivateKey,
+    creator: 'https://example.org/keys/authorized-1'
+  }, function(err, signedConfigEvent) {
+    if(err) {
+      return console.log('Signature failed:', err);
+    }
+    request.post({
+      url: ledgerEndpoint,
+      body: signedConfigEvent,
+      json: true
+    }, function(err, res, body) {
+      if(err) {
+        console.log('Ledger creation failed!');
+      } else if(res.statusCode === 201) {
+        console.log('Ledger created!')
+      }
+    });
+  });
 ```
-npm start
-```
 
-then, direct a web browser to `https://dhs2016ledger.dev:18443/`
+## Configuration
 
-## Disclaimer
+For documentation on configuration, see [config.js](./lib/config.js).
 
-This proof of concept, a part of the "Credentials on Public/Private 
-Linked Ledgers" project, has been funded in part by the United States 
-Department of Homeland Security's Science and Technology Directorate 
-under contract HSHQDC-16-C-00058. The content of this specification 
-does not necessarily reflect the position or the policy of the U.S. 
-Government and no official endorsement should be inferred.
+## API
 
-[host file entry]:http://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/
-[Flex Ledger]:https://digitalbazaar.github.io/flex-ledger/
+### POST /ledgers
+
+Create a new ledger
+
+Schema: [services.ledger.postConfig](./schemas/services.ledger.js)
+
+ * Response codes:
+    * 201: Ledger creation was successful. HTTP Location header contains URL of newly created ledger.
+    * 400: Ledger creation failed due to malformed request.
+    * 403: Ledger creation failed due to invalid digital signature.
+    * 409: Ledger creation failed due to duplicate information.
+
+### POST /ledgers/{ledger}
+
+Append a new event to a ledger.
+
+Schema: [services.ledger.postLedgerEvent](./schemas/services.ledger.js)
+
+  * Response Codes:
+    * 201: Ledger was appended successfully. HTTP Location header contains URL of newly appended event.
+    * 400: Ledger append failed due to malformed request.
+    * 403: Ledger append failed due to invalid digital signature
+    * 409: Ledger append failed due to duplicate information.
+
+### GET /ledgers
+
+Get metadata for all ledgers known to the system.
+
+  * Response Codes:
+    * 200: [Successful response](./examples/get.ledgers.jsonld)
+
+### GET /ledgers/{ledger}
+
+Get metadata for specific ledger known to the system.
+
+  * Response Codes:
+    * 200: [Successful response](./examples/get.ledger.jsonld)
+    * 404: Ledger not found.
+
+### GET /ledgers/{ledger}/state
+
+Get state machine information for a particular object.
+
+  * Response Codes:
+    * 200: [Successful response](./examples/get.ledger.state.jsonld)
+    * 400: Retrieval failed due to malformed query.
+    * 404: Query generated zero results; object not found.
+
+### GET /ledgers/{ledger}/{ledgerId}/events/{eventNumber}
+
+Get metadata for specific ledger event.
+
+  * Response Codes:
+    * 200: [Successful response](./examples/get.ledger.event.jsonld)
+    * 404: Ledger event was not found.
+
+[bedrock]: https://github.com/digitalbazaar/bedrock
