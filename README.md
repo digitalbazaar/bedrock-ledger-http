@@ -1,6 +1,6 @@
-# Bedrock Ledger
+# Bedrock Ledger HTTP API
 
-A [bedrock][] module to control the creation and management of decentralized 
+A [bedrock][] module to control the creation and management of decentralized
 ledgers via an HTTP API.
 
 ## Requirements
@@ -96,14 +96,14 @@ Schema: [services.ledger.postLedgerEvent](./schemas/services.ledger.js)
 Get metadata for all ledgers known to the system.
 
   * Response Codes:
-    * 200: [Successful response](./examples/get.ledgers.jsonld)
+    * 200: [Successful response](./docs/examples/get.ledgers.jsonld)
 
 ### GET /ledgers/{ledger}
 
 Get metadata for specific ledger known to the system.
 
   * Response Codes:
-    * 200: [Successful response](./examples/get.ledger.jsonld)
+    * 200: [Successful response](./docs/examples/get.ledger.jsonld)
     * 404: Ledger not found.
 
 ### GET /ledgers/{ledger}/state
@@ -111,7 +111,7 @@ Get metadata for specific ledger known to the system.
 Get state machine information for a particular object.
 
   * Response Codes:
-    * 200: [Successful response](./examples/get.ledger.state.jsonld)
+    * 200: [Successful response](./docs/examples/get.ledger.state.jsonld)
     * 400: Retrieval failed due to malformed query.
     * 404: Query generated zero results; object not found.
 
@@ -120,7 +120,7 @@ Get state machine information for a particular object.
 Get metadata for specific ledger event.
 
   * Response Codes:
-    * 200: [Successful response](./examples/get.ledger.event.jsonld)
+    * 200: [Successful response](./docs/examples/get.ledger.event.jsonld)
     * 404: Ledger event was not found.
 
 [bedrock]: https://github.com/digitalbazaar/bedrock
