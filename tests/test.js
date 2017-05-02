@@ -3,12 +3,17 @@
  */
 'use strict';
 
-process.env['NODE_PATH'] = '../node_modules';
 var bedrock = require('bedrock');
-// NOTE: it is critical that bedrock-protractor be required first so that
-// it can register a bedrock.cli event listener
-// require('bedrock-protractor');
-require('../lib');
-require('./test.config');
+
+require('bedrock-express');
+require('bedrock-requirejs');
+require('bedrock-validation');
+require('bedrock-views');
+require('bedrock-identity');
+require('bedrock-identity-http');
+require('bedrock-key');
+require('bedrock-key-http');
+require('bedrock-ledger-http');
+
 require('bedrock-test');
 bedrock.start();

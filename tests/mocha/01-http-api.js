@@ -24,27 +24,27 @@ jsigs.use('jsonld', bedrock.jsonld);
 
 // endpoints used by the tests
 var ledgerEndpoint = config.server.baseUri + config.ledger.basePath;
-var dhsLedgerEndpoint = ledgerEndpoint + '/dhs2016ledger';
+var testLedgerEndpoint = ledgerEndpoint + '/testLedger';
 
 // authorized signer URL
-var authorizedSignerUrl = config.server.baseUri + '/keys/fema-key-1';
+var authorizedSignerUrl = config.server.baseUri + '/keys/authorized-key-1';
 
 // unauthorized signer URL
-var unauthorizedSignerUrl = config.server.baseUri + '/keys/isis-key-1';
+var unauthorizedSignerUrl = config.server.baseUri + '/keys/unauthorized-key-1';
 
 // constants
 var GENESIS_HASH = 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000';
 
 // base ledger configuration event
 var ledgerConfigurationEvent = {
-  '@context': 'https://w3id.org/flex/v1',
+  '@context': 'https://w3id.org/webledger/v1',
   id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/1',
   type: 'LedgerConfigurationEvent',
   ledgerConfig: {
     id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3',
     type: 'LedgerConfiguration',
-    name: 'dhs2016ledger',
-    description: 'A proof of concept for a Verifiable Claims ledger',
+    name: 'testLedger',
+    description: 'A test Verifiable Claims ledger',
     storageMechanism: 'SequentialList',
     consensusAlgorithm: {
       type: 'ProofOfSignature2016',
@@ -60,8 +60,8 @@ var ledgerConfigurationEvent = {
 // ledger storage event - verifiable claim
 var firstLedgerStorageEvent = {
   '@context': [
-    'https://w3id.org/flex/v1',
-    'https://w3id.org/dhs/v1',
+    'https://w3id.org/webledger/v1',
+    'https://w3id.org/test/v1',
   ],
   id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/2',
   type: 'LedgerStorageEvent',
@@ -83,8 +83,8 @@ var firstLedgerStorageEvent = {
 };
 var secondLedgerStorageEvent = {
   '@context': [
-    'https://w3id.org/flex/v1',
-    'https://w3id.org/dhs/v1',
+    'https://w3id.org/webledger/v1',
+    'https://w3id.org/test/v1',
   ],
   id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/3',
   type: 'LedgerStorageEvent',
@@ -105,7 +105,7 @@ var secondLedgerStorageEvent = {
   }
 };
 
-describe('DHS 2016 Ledger HTTP API', function() {
+describe('Web Ledger HTTP API', function() {
   before(function(done) {
     helpers.prepareDatabase(mockData, done);
   });
@@ -117,7 +117,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should allow initial configuration', function(done) {
       jsigs.sign(ledgerConfigurationEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedConfigEvent) {
         if(err) {
@@ -148,7 +148,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow unauthorized configuration', function(done) {
       jsigs.sign(ledgerConfigurationEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.isis.privateKey,
+        privateKeyPem: mockData.groups.unauthorized.privateKey,
         creator: unauthorizedSignerUrl
       }, function(err, signedConfigEvent) {
         if(err) {
@@ -168,7 +168,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow invalid signature', function(done) {
       jsigs.sign(ledgerConfigurationEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedConfigEvent) {
         if(err) {
@@ -192,7 +192,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow malformed configuration', function(done) {
       jsigs.sign(ledgerConfigurationEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedConfigEvent) {
         if(err) {
@@ -217,14 +217,14 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should allow signed write', function(done) {
       jsigs.sign(firstLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedStorageEvent) {
         if(err) {
           return done(err);
         }
         request.post({
-          url: dhsLedgerEndpoint,
+          url: testLedgerEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -237,14 +237,14 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should allow signed update', function(done) {
       jsigs.sign(secondLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedStorageEvent) {
         if(err) {
           return done(err);
         }
         request.post({
-          url: dhsLedgerEndpoint,
+          url: testLedgerEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -256,7 +256,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     });
     it('should not allow unsigned write', function(done) {
       request.post({
-        url: dhsLedgerEndpoint,
+        url: testLedgerEndpoint,
         body: firstLedgerStorageEvent,
         json: true
       }, function(err, res, body) {
@@ -271,14 +271,14 @@ describe('DHS 2016 Ledger HTTP API', function() {
 
       jsigs.sign(secondLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedStorageEvent) {
         if(err) {
           return done(err);
         }
         request.post({
-          url: dhsLedgerEndpoint,
+          url: testLedgerEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -291,7 +291,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow unauthorized write', function(done) {
       jsigs.sign(secondLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedStorageEvent) {
         if(err) {
@@ -299,7 +299,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
         }
         signedStorageEvent.signature.creator = unauthorizedSignerUrl;
         request.post({
-          url: dhsLedgerEndpoint,
+          url: testLedgerEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -312,7 +312,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow invalid signature', function(done) {
       jsigs.sign(secondLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedStorageEvent) {
         if(err) {
@@ -322,7 +322,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
         signedStorageEvent.signature.signatureValue =
           signedStorageEvent.signature.signatureValue.replace('a', 'b');
         request.post({
-          url: dhsLedgerEndpoint,
+          url: testLedgerEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -335,7 +335,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
     it('should not allow malformed writes', function(done) {
       jsigs.sign(secondLedgerStorageEvent, {
         algorithm: 'LinkedDataSignature2015',
-        privateKeyPem: mockData.agencies.fema.privateKey,
+        privateKeyPem: mockData.groups.authorized.privateKey,
         creator: authorizedSignerUrl
       }, function(err, signedStorageEvent) {
         if(err) {
@@ -344,7 +344,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
         // make the storage event malformed
         delete signedStorageEvent.previousEvent.id;
         request.post({
-          url: dhsLedgerEndpoint,
+          url: testLedgerEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -360,15 +360,15 @@ describe('DHS 2016 Ledger HTTP API', function() {
       request(ledgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
-        body.ledger[0].name.should.equal('dhs2016ledger');
+        body.ledger[0].name.should.equal('testLedger');
         done();
       });
     });
     it('should allow access to specific ledger metadata', function(done) {
-      request(dhsLedgerEndpoint, function(err, res, body) {
+      request(testLedgerEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
-        body.name.should.equal('dhs2016ledger');
+        body.name.should.equal('testLedger');
         done();
       });
     });
@@ -376,19 +376,19 @@ describe('DHS 2016 Ledger HTTP API', function() {
       var currentHash = '';
       async.auto({
         getLatestEvent: function(callback) {
-          request(dhsLedgerEndpoint, function(err, res, body) {
+          request(testLedgerEndpoint, function(err, res, body) {
             callback(err, body);
           });
         },
         crawlToGenesisEvent: ['getLatestEvent', function(callback, results) {
           var currentUrl =
-            dhsLedgerEndpoint + '/' + results.getLatestEvent.latestEvent.id;
+            testLedgerEndpoint + '/' + results.getLatestEvent.latestEvent.id;
           currentHash = results.getLatestEvent.latestEvent.hash;
           async.until(function() {
               return currentHash == GENESIS_HASH;
             }, function(callback) {
               request(currentUrl, function(err, res, body) {
-                currentUrl = dhsLedgerEndpoint + '/' + body.previousEvent.id;
+                currentUrl = testLedgerEndpoint + '/' + body.previousEvent.id;
                 currentHash = body.previousEvent.hash;
                 callback(err, body);
               });
@@ -407,7 +407,7 @@ describe('DHS 2016 Ledger HTTP API', function() {
   });
   describe('ledger querying', function() {
     it('should provide latest state for ledger entry', function(done) {
-      var query = dhsLedgerEndpoint + '/state?id=' +
+      var query = testLedgerEndpoint + '/state?id=' +
       'https://example.us.gov/credentials/234234542';
       request(query, function(err, res, body) {
         should.not.exist(err);
