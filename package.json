@@ -1,6 +1,6 @@
 {
   "name": "bedrock-ledger-http",
-  "version": "0.3.4",
+  "version": "0.3.5-dev",
   "description": "Bedrock ledger HTTP API",
   "main": "./lib",
   "repository": {
