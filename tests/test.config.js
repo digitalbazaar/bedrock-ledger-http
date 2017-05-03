@@ -5,8 +5,6 @@ var config = require('bedrock').config;
 var fs = require('fs');
 var path = require('path');
 
-config.mocha.tests.push(path.join(__dirname, '..', 'tests'));
-
 // MongoDB
 config.mongodb.name = 'bedrock_ledger_http_test';
 config.mongodb.host = 'localhost';

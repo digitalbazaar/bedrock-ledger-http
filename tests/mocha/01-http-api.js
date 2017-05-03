@@ -380,7 +380,7 @@ describe('Web Ledger HTTP API', function() {
             callback(err, body);
           });
         },
-        crawlToGenesisEvent: ['getLatestEvent', function(callback, results) {
+        crawlToGenesisEvent: ['getLatestEvent', function(results, callback) {
           var currentUrl =
             testLedgerEndpoint + '/' + results.getLatestEvent.latestEvent.id;
           currentHash = results.getLatestEvent.latestEvent.hash;
