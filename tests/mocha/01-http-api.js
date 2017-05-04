@@ -23,10 +23,11 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 jsigs.use('jsonld', bedrock.jsonld);
 
 // endpoints used by the tests
-var ledgerEndpoint = config.server.baseUri + config.ledger.basePath;
-var testLedgerEndpoint = ledgerEndpoint + '/testLedger';
+var ledgerAgentsEndpoint = config.server.baseUri + config.ledger.basePath;
+var testAgentEndpoint = ledgerAgentsEndpoint + '/testLedger';
 
 // authorized signer URL
+var authorizedOwner = config.server.baseUri + '/i/authorized';
 var authorizedSignerUrl = config.server.baseUri + '/keys/authorized-key-1';
 
 // unauthorized signer URL
@@ -124,7 +125,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: ledgerEndpoint,
+          url: ledgerAgentsEndpoint,
           body: signedConfigEvent,
           json: true
         }, function(err, res, body) {
@@ -136,7 +137,7 @@ describe('Web Ledger HTTP API', function() {
     });
     it('should not allow unsigned configuration', function(done) {
       request.post({
-        url: ledgerEndpoint,
+        url: ledgerAgentsEndpoint,
         body: ledgerConfigurationEvent,
         json: true
       }, function(err, res, body) {
@@ -155,7 +156,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: ledgerEndpoint,
+          url: ledgerAgentsEndpoint,
           body: signedConfigEvent,
           json: true
         }, function(err, res, body) {
@@ -179,7 +180,7 @@ describe('Web Ledger HTTP API', function() {
           signedConfigEvent.signature.signatureValue.replace('a', 'b');
 
         request.post({
-          url: ledgerEndpoint,
+          url: ledgerAgentsEndpoint,
           body: signedConfigEvent,
           json: true
         }, function(err, res, body) {
@@ -202,7 +203,7 @@ describe('Web Ledger HTTP API', function() {
         signedConfigEvent.ledgerConfig.consensusAlgorithm.approvedSigner =
           authorizedSignerUrl;
         request.post({
-          url: ledgerEndpoint,
+          url: ledgerAgentsEndpoint,
           body: signedConfigEvent,
           json: true
         }, function(err, res, body) {
@@ -224,7 +225,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: testLedgerEndpoint,
+          url: testAgentEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -244,7 +245,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: testLedgerEndpoint,
+          url: testAgentEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -256,7 +257,7 @@ describe('Web Ledger HTTP API', function() {
     });
     it('should not allow unsigned write', function(done) {
       request.post({
-        url: testLedgerEndpoint,
+        url: testAgentEndpoint,
         body: firstLedgerStorageEvent,
         json: true
       }, function(err, res, body) {
@@ -278,7 +279,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: testLedgerEndpoint,
+          url: testAgentEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -299,7 +300,7 @@ describe('Web Ledger HTTP API', function() {
         }
         signedStorageEvent.signature.creator = unauthorizedSignerUrl;
         request.post({
-          url: testLedgerEndpoint,
+          url: testAgentEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -322,7 +323,7 @@ describe('Web Ledger HTTP API', function() {
         signedStorageEvent.signature.signatureValue =
           signedStorageEvent.signature.signatureValue.replace('a', 'b');
         request.post({
-          url: testLedgerEndpoint,
+          url: testAgentEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -344,7 +345,7 @@ describe('Web Ledger HTTP API', function() {
         // make the storage event malformed
         delete signedStorageEvent.previousEvent.id;
         request.post({
-          url: testLedgerEndpoint,
+          url: testAgentEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -357,7 +358,16 @@ describe('Web Ledger HTTP API', function() {
   });
   describe('ledger reading', function() {
     it('should allow access to all ledger metadata', function(done) {
-      request(ledgerEndpoint, function(err, res, body) {
+      request(ledgerAgentsEndpoint, function(err, res, body) {
+        should.not.exist(err);
+        res.statusCode.should.equal(200);
+        body.ledger[0].name.should.equal('testLedger');
+        done();
+      });
+    });
+    it('should allow access to ledger metadata by owner', function(done) {
+      var ledgerQuery = ledgerAgentsEndpoint + '?owner=' + authorizedOwner;
+      request(ledgerQuery, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
         body.ledger[0].name.should.equal('testLedger');
@@ -365,7 +375,7 @@ describe('Web Ledger HTTP API', function() {
       });
     });
     it('should allow access to specific ledger metadata', function(done) {
-      request(testLedgerEndpoint, function(err, res, body) {
+      request(testAgentEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);
         body.name.should.equal('testLedger');
@@ -376,19 +386,19 @@ describe('Web Ledger HTTP API', function() {
       var currentHash = '';
       async.auto({
         getLatestEvent: function(callback) {
-          request(testLedgerEndpoint, function(err, res, body) {
+          request(testAgentEndpoint, function(err, res, body) {
             callback(err, body);
           });
         },
         crawlToGenesisEvent: ['getLatestEvent', function(results, callback) {
           var currentUrl =
-            testLedgerEndpoint + '/' + results.getLatestEvent.latestEvent.id;
+            testAgentEndpoint + '/' + results.getLatestEvent.latestEvent.id;
           currentHash = results.getLatestEvent.latestEvent.hash;
           async.until(function() {
               return currentHash == GENESIS_HASH;
             }, function(callback) {
               request(currentUrl, function(err, res, body) {
-                currentUrl = testLedgerEndpoint + '/' + body.previousEvent.id;
+                currentUrl = testAgentEndpoint + '/' + body.previousEvent.id;
                 currentHash = body.previousEvent.hash;
                 callback(err, body);
               });
@@ -407,7 +417,7 @@ describe('Web Ledger HTTP API', function() {
   });
   describe('ledger querying', function() {
     it('should provide latest state for ledger entry', function(done) {
-      var query = testLedgerEndpoint + '/state?id=' +
+      var query = testAgentEndpoint + '/state?id=' +
       'https://example.us.gov/credentials/234234542';
       request(query, function(err, res, body) {
         should.not.exist(err);
