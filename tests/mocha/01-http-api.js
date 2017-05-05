@@ -25,6 +25,7 @@ jsigs.use('jsonld', bedrock.jsonld);
 // endpoints used by the tests
 var ledgerAgentsEndpoint = config.server.baseUri + config.ledger.basePath;
 var testAgentEndpoint = ledgerAgentsEndpoint + '/testLedger';
+var testLedgerEventsEndpoint = testAgentEndpoint + '/events';
 
 // authorized signer URL
 var authorizedOwner = config.server.baseUri + '/i/authorized';
@@ -225,7 +226,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: testAgentEndpoint,
+          url: testLedgerEventsEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -245,7 +246,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: testAgentEndpoint,
+          url: testLedgerEventsEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -257,7 +258,7 @@ describe('Web Ledger HTTP API', function() {
     });
     it('should not allow unsigned write', function(done) {
       request.post({
-        url: testAgentEndpoint,
+        url: testLedgerEventsEndpoint,
         body: firstLedgerStorageEvent,
         json: true
       }, function(err, res, body) {
@@ -279,7 +280,7 @@ describe('Web Ledger HTTP API', function() {
           return done(err);
         }
         request.post({
-          url: testAgentEndpoint,
+          url: testLedgerEventsEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -300,7 +301,7 @@ describe('Web Ledger HTTP API', function() {
         }
         signedStorageEvent.signature.creator = unauthorizedSignerUrl;
         request.post({
-          url: testAgentEndpoint,
+          url: testLedgerEventsEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -323,7 +324,7 @@ describe('Web Ledger HTTP API', function() {
         signedStorageEvent.signature.signatureValue =
           signedStorageEvent.signature.signatureValue.replace('a', 'b');
         request.post({
-          url: testAgentEndpoint,
+          url: testLedgerEventsEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -345,7 +346,7 @@ describe('Web Ledger HTTP API', function() {
         // make the storage event malformed
         delete signedStorageEvent.previousEvent.id;
         request.post({
-          url: testAgentEndpoint,
+          url: testLedgerEventsEndpoint,
           body: signedStorageEvent,
           json: true
         }, function(err, res, body) {
@@ -365,7 +366,7 @@ describe('Web Ledger HTTP API', function() {
         done();
       });
     });
-    it('should allow access to ledger metadata by owner', function(done) {
+    it.skip('should allow access to ledger metadata by owner', function(done) {
       var ledgerQuery = ledgerAgentsEndpoint + '?owner=' + authorizedOwner;
       request(ledgerQuery, function(err, res, body) {
         should.not.exist(err);
