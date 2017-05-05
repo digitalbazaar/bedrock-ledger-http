@@ -393,13 +393,16 @@ describe('Web Ledger HTTP API', function() {
         },
         crawlToGenesisEvent: ['getLatestEvent', function(results, callback) {
           var currentUrl =
-            testAgentEndpoint + '/' + results.getLatestEvent.latestEvent.id;
+            testAgentEndpoint + '/blocks?id=' +
+            results.getLatestEvent.latestEvent.id;
           currentHash = results.getLatestEvent.latestEvent.hash;
           async.until(function() {
               return currentHash == GENESIS_HASH;
             }, function(callback) {
               request(currentUrl, function(err, res, body) {
-                currentUrl = testAgentEndpoint + '/' + body.previousEvent.id;
+                should.not.exist(err);
+                currentUrl = testAgentEndpoint + '/blocks?id=' +
+                  body.previousEvent.id;
                 currentHash = body.previousEvent.hash;
                 callback(err, body);
               });
@@ -418,7 +421,7 @@ describe('Web Ledger HTTP API', function() {
   });
   describe('ledger querying', function() {
     it('should provide latest state for ledger entry', function(done) {
-      var query = testAgentEndpoint + '/state?id=' +
+      var query = testAgentEndpoint + '/query?id=' +
       'https://example.us.gov/credentials/234234542';
       request(query, function(err, res, body) {
         should.not.exist(err);
