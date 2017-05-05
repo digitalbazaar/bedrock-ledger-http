@@ -1,5 +1,8 @@
 # bedrock-ledger-http ChangeLog
 
+## 0.3.6 - 2017-05-05
+- Implement ledger agent concept.
+
 ## 0.3.5 - 2017-05-04
 - Fix documentation build bug.
 
