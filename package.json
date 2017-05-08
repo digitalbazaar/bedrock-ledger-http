@@ -5,7 +5,7 @@
   "main": "./lib",
   "repository": {
     "type": "git",
-    "url": "https://github.com/digitalbazaar/bedrock-ledger.git"
+    "url": "https://github.com/digitalbazaar/bedrock-ledger-http.git"
   },
   "author": {
     "name": "Digital Bazaar, Inc.",
@@ -13,9 +13,9 @@
     "url": "http://digitalbazaar.com"
   },
   "bugs": {
-    "url": "https://github.com/digitalbazaar/bedrock-ledger/issues"
+    "url": "https://github.com/digitalbazaar/bedrock-ledger-http/issues"
   },
-  "homepage": "https://github.com/digitalbazaar/bedrock-ledger",
+  "homepage": "https://github.com/digitalbazaar/bedrock-ledger-http",
   "peerDependencies": {
     "bedrock": "^1.2.4",
     "bedrock-ledger": "^0.3.0",
