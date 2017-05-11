@@ -12,10 +12,7 @@ var helpers = require('./helpers');
 var jsigs = require('jsonld-signatures');
 var mockData = require('./mock.data');
 var request = require('request');
-request = request.defaults({json: true});
-
-// ignore invalid TLS certificates in test mode
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+request = request.defaults({json: true, strictSSL: false});
 
 // use local JSON-LD processor for signatures
 jsigs.use('jsonld', bedrock.jsonld);
@@ -111,7 +108,7 @@ describe('Web Ledger HTTP API', function() {
     helpers.prepareDatabase(mockData, done);
   });
   after(function(done) {
-    //helpers.removeCollections(done);
+    // helpers.removeCollections(done);
     done();
   });
   describe('configuration', function() {
@@ -396,26 +393,23 @@ describe('Web Ledger HTTP API', function() {
             results.getLatestEvent.latestEvent.id;
           currentHash = results.getLatestEvent.latestEvent.hash;
           async.until(function() {
-              return currentHash == GENESIS_HASH;
-            }, function(callback) {
-              request(currentUrl, function(err, res, body) {
-                should.not.exist(err);
-                currentUrl = testAgentEndpoint + '/blocks?id=' +
-                  body.previousEvent.id;
-                currentHash = body.previousEvent.hash;
-                callback(err, body);
-              });
-            },
-            function (err, result) {
-              result.id.should.equal(
-                'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/1');
-              result.previousEvent.hash.should.equal(
-                GENESIS_HASH);
-              done(err, result);
-          });
-        }]}, function(err, results) {
-          done(err);
-        });
+            return currentHash == GENESIS_HASH;
+          }, function(callback) {
+            request(currentUrl, function(err, res, body) {
+              should.not.exist(err);
+              currentUrl = testAgentEndpoint + '/blocks?id=' +
+                body.previousEvent.id;
+              currentHash = body.previousEvent.hash;
+              callback(err, body);
+            });
+          }, function(err, result) {
+            result.id.should.equal(
+              'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/1');
+            result.previousEvent.hash.should.equal(
+              GENESIS_HASH);
+            callback(err, result);
+          }, callback);
+        }]}, done);
     });
   });
   describe('ledger querying', function() {
