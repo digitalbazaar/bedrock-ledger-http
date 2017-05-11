@@ -1,8 +1,6 @@
 /*
- * Copyright (c) 2016 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2016-2017 Digital Bazaar, Inc. All rights reserved.
  */
- /* jshint node: true */
-
 'use strict';
 
 var _ = require('lodash');

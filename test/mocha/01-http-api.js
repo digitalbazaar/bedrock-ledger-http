@@ -1,9 +1,6 @@
 /*
- * Copyright (c) 2016 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2016-2017 Digital Bazaar, Inc. All rights reserved.
  */
- /* globals describe, before, after, it, should, beforeEach, afterEach */
- /* jshint node: true */
-
 'use strict';
 
 var _ = require('lodash');
@@ -35,7 +32,8 @@ var authorizedSignerUrl = config.server.baseUri + '/keys/authorized-key-1';
 var unauthorizedSignerUrl = config.server.baseUri + '/keys/unauthorized-key-1';
 
 // constants
-var GENESIS_HASH = 'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000';
+var GENESIS_HASH =
+  'urn:sha256:0000000000000000000000000000000000000000000000000000000000000000';
 
 // base ledger configuration event
 var ledgerConfigurationEvent = {
@@ -52,7 +50,7 @@ var ledgerConfigurationEvent = {
       type: 'ProofOfSignature2016',
       approvedSigner: [authorizedSignerUrl],
       minimumSignaturesRequired: 1
-    },
+    }
   },
   previousEvent: {
     hash: GENESIS_HASH
@@ -63,7 +61,7 @@ var ledgerConfigurationEvent = {
 var firstLedgerStorageEvent = {
   '@context': [
     'https://w3id.org/webledger/v1',
-    'https://w3id.org/test/v1',
+    'https://w3id.org/test/v1'
   ],
   id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/2',
   type: 'LedgerStorageEvent',

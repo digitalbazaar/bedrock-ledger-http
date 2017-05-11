@@ -5,14 +5,11 @@ var config = require('bedrock').config;
 var fs = require('fs');
 var path = require('path');
 
+config.mocha.tests.push(path.join(__dirname, 'mocha'));
+
 // MongoDB
 config.mongodb.name = 'bedrock_ledger_http_test';
-config.mongodb.host = 'localhost';
-config.mongodb.port = 27017;
 config.mongodb.local.collection = 'bedrock_ledger_http_test';
-config.mongodb.username = 'admin';
-config.mongodb.password = 'password';
-config.mongodb.adminPrompt = true;
 config.mongodb.dropCollections.onInit = true;
 config.mongodb.dropCollections.collections = [];
 
@@ -23,9 +20,6 @@ config.server.bindAddr = ['ledger.bedrock.dev'];
 config.server.domain = 'ledger.bedrock.dev';
 config.server.host = 'ledger.bedrock.dev:39080';
 config.server.baseUri = 'http://' + config.server.host;
-
-//only run the local package tests
-config.mocha.tests = ['mocha/01-http-api.js'];
 
 // ledger constants
 var constants = config.constants;
