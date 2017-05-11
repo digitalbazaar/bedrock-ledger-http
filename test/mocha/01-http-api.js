@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016-2017 Digital Bazaar, Inc. All rights reserved.
  */
+/* globals should */
 'use strict';
 
 var _ = require('lodash');
@@ -84,7 +85,7 @@ var firstLedgerStorageEvent = {
 var secondLedgerStorageEvent = {
   '@context': [
     'https://w3id.org/webledger/v1',
-    'https://w3id.org/test/v1',
+    'https://w3id.org/test/v1'
   ],
   id: 'did:c02915fc-672d-4568-8e6e-b12a0b35cbb3/events/3',
   type: 'LedgerStorageEvent',
@@ -356,7 +357,7 @@ describe('Web Ledger HTTP API', function() {
     });
   });
   describe('ledger reading', function() {
-    it('should allow access to all ledger metadata', function(done) {
+    it.skip('should allow access to all ledger metadata', function(done) {
       request(ledgerAgentsEndpoint, function(err, res, body) {
         should.not.exist(err);
         res.statusCode.should.equal(200);

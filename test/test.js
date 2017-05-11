@@ -18,12 +18,4 @@ require('bedrock-ledger-http');
 
 require('bedrock-test');
 
-// only run application on HTTP port
-bedrock.events.on('bedrock-express.ready', function(app) {
-  // attach express to regular http
-  brServer.servers.http.on('request', app);
-  // cancel default behavior of attaching to HTTPS
-  return false;
-});
-
 bedrock.start();

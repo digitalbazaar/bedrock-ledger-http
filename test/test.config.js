@@ -18,8 +18,6 @@ config.server.port = 39443;
 config.server.httpPort = 39080;
 config.server.bindAddr = ['ledger.bedrock.dev'];
 config.server.domain = 'ledger.bedrock.dev';
-config.server.host = 'ledger.bedrock.dev:39080';
-config.server.baseUri = 'http://' + config.server.host;
 
 // ledger constants
 var constants = config.constants;
