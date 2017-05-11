@@ -1,3 +1,5 @@
+[![Build Status](http://ci.digitalbazaar.com/buildStatus/icon?job=bedrock-ledger-http)](http://ci.digitalbazaar.com/job/bedrock-ledger-http)
+
 # Bedrock Ledger HTTP API
 
 A [bedrock][] module to control the creation and management of decentralized
